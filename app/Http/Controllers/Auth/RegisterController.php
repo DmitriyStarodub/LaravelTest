@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Mail\UserRegistered;
+use Illuminate\Support\Facades\Mail;
 use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
@@ -29,6 +31,7 @@ class RegisterController extends Controller
      */
     protected $redirectTo = '/home';
 
+ 
     /**
      * Create a new controller instance.
      *
@@ -62,10 +65,16 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+        $newUser = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
-        ]);
+        ]); 
+        
+        Mail::to($newUser)->send(new UserRegistered($newUser));
+        
+        return $newUser;
     }
+
+
 }
